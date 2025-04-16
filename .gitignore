@@ -11,3 +11,8 @@ _CPack_Packages/
 *tar.gz
 *vgcore*
 *.o
+debian/.debhelper/
+debian/tmp
+debian/libprom
+debian/debhelper-build-stamp
+debian/files
