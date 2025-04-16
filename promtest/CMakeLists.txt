@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.9.1)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
@@ -10,47 +10,26 @@ execute_process(
 
 execute_process(
     COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION
-    COMMAND sed --regexp-extended "s/([0-9]+)\.([0-9])+\.([0-9]+)/\\1/g"
+    COMMAND cut -f1 -d.
     OUTPUT_VARIABLE MajorVersion
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 execute_process(
     COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION
-    COMMAND sed --regexp-extended "s/([0-9]+)\.([0-9])+\.([0-9]+)/\\2/"
+    COMMAND cut -f2 -d.
     OUTPUT_VARIABLE MinorVersion
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 execute_process(
     COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION
-    COMMAND sed --regexp-extended "s/([0-9]+)\.([0-9])+\.([0-9]+)/\\3/"
+    COMMAND cut -f3 -d.
     OUTPUT_VARIABLE PatchVersion
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 project(promtest VERSION ${Version} LANGUAGES C)
-
-set(prom_deb ${CMAKE_CURRENT_SOURCE_DIR}/../prom/libprom-dev-${Version}-Linux.deb)
-set(promhttp_deb ${CMAKE_CURRENT_SOURCE_DIR}/../promhttp/libpromhttp-dev-${Version}-Linux.deb)
-
-execute_process(
-    COMMAND dpkg -i ${prom_deb}
-    RESULT_VARIABLE prom_install_result
-)
-
-if(${prom_install_result} GREATER 0)
-    message(FATAL_ERROR "failed to install ${prom_deb}")
-endif()
-
-execute_process(
-    COMMAND dpkg -i ${promhttp_deb}
-    RESULT_VARIABLE promhttp_install_result
-)
-
-if(${promhttp_install_result} GREATER 0)
-    message(FATAL_ERROR "failed to install ${promhttp_deb}")
-endif()
 
 enable_testing()
 set(vendor_dir ${CMAKE_SOURCE_DIR}/../vendor)
@@ -116,7 +95,15 @@ add_executable(
     ${test_dir}/promtest_histogram.h
 )
 target_link_libraries(promtest microhttpd prom promhttp Unity parson Threads::Threads)
-target_include_directories(promtest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(promtest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src  ${CMAKE_CURRENT_SOURCE_DIR}/../prom/include  ${CMAKE_CURRENT_SOURCE_DIR}/../promhttp/include /usr/include/microhttpd /opt/local/include )
+
+if (CMAKE_VERSION VERSION_LESS 3.13.0)
+# buggy cmake crap has no effect: link_directories( ... )
+# so we use the wooden hammer:
+set(CMAKE_C_LINK_FLAGS "-L ${CMAKE_CURRENT_SOURCE_DIR}/../prom/build -L ${CMAKE_CURRENT_SOURCE_DIR}/../promhttp/build")
+else()
+target_link_directories( promtest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../prom/build  ${CMAKE_CURRENT_SOURCE_DIR}/../promhttp/build /opt/local/lib )
+endif()
 add_test(
     NAME promtest
     COMMAND promtest

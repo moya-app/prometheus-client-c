@@ -4,6 +4,15 @@ include /usr/share/dpkg/default.mk
 
 export DH_VERBOSE=1
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+$(foreach v, $(filter-out .VARIABLES,$(.VARIABLES)), $(info $(v) = $($(v))))
 
+override_dh_auto_install:
+	dh_auto_install
+	cd debian/libprom/usr/lib/$(DEB_BUILD_GNU_TYPE) && \
+		mv libprom.so libprom.so-$(DEB_VERSION_UPSTREAM) && \
+		ln -s libprom.so-$(DEB_VERSION_UPSTREAM) libprom.so
+	cd debian/libprom/usr/lib/$(DEB_BUILD_GNU_TYPE) && \
+		mv libpromhttp.so libpromhttp.so-$(DEB_VERSION_UPSTREAM) && \
+		ln -s libpromhttp.so-$(DEB_VERSION_UPSTREAM) libpromhttp.so
 %:
 	dh $@
