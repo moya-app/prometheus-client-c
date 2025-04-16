@@ -16,3 +16,4 @@ debian/tmp
 debian/libprom
 debian/debhelper-build-stamp
 debian/files
+debian/libprom-dev

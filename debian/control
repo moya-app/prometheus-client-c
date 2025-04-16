@@ -21,4 +21,10 @@ Description: This project provides shared libraries for instrumenting software v
  * libprom - Provides the core API. Resources such as counters, gauges, histograms, and collector registries can be found here. This library has no dependencies on third-party libraries; however, it does rely on pthreads native to POSIX systems.
  * libpromhttp - Provides a simple web handler to expose Prometheus metrics for scraping. This library has a dependency on libmicrohttpd.
 
+Package: libprom-dev
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: This project provides include files for libprom
 

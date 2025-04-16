@@ -4,18 +4,24 @@ include /usr/share/dpkg/default.mk
 
 export DH_VERBOSE=1
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-INSTALL_DIR := debian/tmp/usr/lib/$(DEB_BUILD_GNU_TYPE)
+INSTALL_DIR = debian/tmp/usr
+LIBPROM_LIBDIR = $(INSTALL_DIR)/lib/$(DEB_BUILD_GNU_TYPE)
+LIBPROM_INCLUDEDIR = $(INSTALL_DIR)/include
 
 # Override makefile
 override_dh_auto_install:
-	install -m 755 -d $(INSTALL_DIR)
-	install -m 755 prom/build/libprom.so $(INSTALL_DIR)
-	install -m 755 promhttp/build/libpromhttp.so $(INSTALL_DIR)
-	cd $(INSTALL_DIR) && \
+	install -m 755 -d $(LIBPROM_LIBDIR)
+	install -m 755 -d $(LIBPROM_INCLUDEDIR)
+	install -m 755 prom/build/libprom.so $(LIBPROM_LIBDIR)
+	install -m 755 promhttp/build/libpromhttp.so $(LIBPROM_LIBDIR)
+	cd $(LIBPROM_LIBDIR) && \
 		mv libprom.so libprom.so-$(DEB_VERSION_UPSTREAM) && \
 		ln -s libprom.so-$(DEB_VERSION_UPSTREAM) libprom.so
-	cd $(INSTALL_DIR) && \
+	cd $(LIBPROM_LIBDIR) && \
 		mv libpromhttp.so libpromhttp.so-$(DEB_VERSION_UPSTREAM) && \
 		ln -s libpromhttp.so-$(DEB_VERSION_UPSTREAM) libpromhttp.so
+	install -m 644 prom/include/*.h $(LIBPROM_INCLUDEDIR)
+	install -m 644 promhttp/include/*.h $(LIBPROM_INCLUDEDIR)
+
 %:
 	dh $@
