@@ -1,0 +1,24 @@
+Source: libprom
+Section: httpd
+Priority: optional
+Maintainer: Aldemir Akpinar <aldemir.akpinar@moya.app>
+Uploaders: Aldemir Akpinar <aldemir.akpinar@moya.app>
+Build-Depends: debhelper-compat (= 12),
+               libmicrohttpd-dev,
+               cmake
+Standards-Version: 4.6.2
+Homepage: https://github.com/moya-app/prometheus-client-c
+Vcs-Git: https://github.com/moya-app/prometheus-client-c
+Vcs-Browser: https://github.com/moya-app/prometheus-client-c
+Rules-Requires-Root: no
+
+Package: libprom
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: This project provides shared libraries for instrumenting software via Prometheus
+ * libprom - Provides the core API. Resources such as counters, gauges, histograms, and collector registries can be found here. This library has no dependencies on third-party libraries; however, it does rely on pthreads native to POSIX systems.
+ * libpromhttp - Provides a simple web handler to expose Prometheus metrics for scraping. This library has a dependency on libmicrohttpd.
+
+
